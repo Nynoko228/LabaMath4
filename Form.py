@@ -6,12 +6,12 @@ from Scrolling import ScrollableImage
 
 
 class Application(tk.Frame):
-    def __init__(self, f, f2, master=None):
+    def __init__(self, f, master=None):
         self.master = master
         tk.Frame.__init__(self, master)
         self.pack()
         self.fin = f
-        self.fin2 = f2
+        # self.fin2 = f2
         self.createWidgets()
 
 

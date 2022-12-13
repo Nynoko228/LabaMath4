@@ -1,4 +1,4 @@
-import matplotlib.pyplot as plt #для графиков
+import matplotlib.pyplot as plt  # для графиков
 import math
 import numpy
 from scipy import integrate
@@ -8,77 +8,82 @@ from matplotlib.patches import Polygon
 # Аппроксимация полиномиальной кривой с одной переменной
 
 
-import tkinter as tk #для интерфейса
+import tkinter as tk  # для интерфейса
 from tkinter import ttk
 
+
 # Функция formula() составляет latex-код наших формул
-def formula():
-    form1 = "Формулы для 3-их разностей: " \
-            "Правые: " + r"$\frac{1}{2h}(-y_{2}+4y_{1}-3y_{0})$ " \
-                         "Центральные: " + r"$\frac{1}{2h}(y_{1}-y_{-1})$ " \
-                                           "Левые: " + r"$\frac{1}{2h}(3y_{0}-4y_{-1}+y_{-2})$ "
-    form2 = "Формулы для 5-ых разностей: " \
-            "Правые: " + r"$\frac{1}{12h}(-3y_{4}+16y_{3}-36y_{2}+48y_{1}-25y_{0})$ " \
-                         "Центральные: " + r"$\frac{1}{12h}(-y_{2}+8y_{1}-8y_{-1}+y_{-2})$ " \
-                                           "Левые: " + r"$\frac{1}{12h}(3y_{-4}-16y_{-3}+36y_{-2}-48y_{-1}+25y_{0})$"
+def formula(n):
+    form = ""
+    match n:
+        case 1:
+            form = "Формула для чётного количества интервалов: " r"$I=\int_{a}^{b}f(x)dx\approx \frac{h}{3}(y_{0}+4y_{1}+2y_{2}+4y_{3}+...+4y_{n-1}+y_{n})$ "
+        case 2:
+            form = "Формула для нечётного количества интервалов: Для первых 4 значений y используем: " + r"$A_{3}=\frac{3h}{8}(y_{0}+3y_{1}+3y_{2}+y_{3})$ Для оставшихся используем: $\frac{h}{3}(4y_{4}+2y_{5}+4y_{6}+...+4y_{n-1}+y_{n})$"
     root = tk.Toplevel()
-    app = Application(form1, form2, master=root)
+    app = Application(form, master=root)
     app.mainloop()
 
+
+# Функция colculation(a) высчитывает значение интеграла для функции с индексом a
 def colculation(a):
     if (a == 0):
         lstX = numpy.arange(0.8, 1.21, 0.02)
-        lmd = lambda x: (1/(math.sqrt(2*pow(x, 2)+1)))
+        lmd = lambda x: (1 / (math.sqrt(2 * pow(x, 2) + 1)))
         lstY = list(map(lmd, lstX))
         lstfullY = list(map(lmd, numpy.arange(0, 10, 0.02)))
         result = "{:.2f}".format(integrate.simpson([lmd(i) for i in lstX], dx=0.02))
         print(result)
-        thread1 = Thread(target=lambda : Table(lstX, lstY, result, "scipy"))
+        thread1 = Thread(target=lambda: Table(lstX, lstY, result, "scipy"))
         resultSvoi = 0
         resultSvoi += lstY[0]
-        for i in range(1, len(lstY)-1):
+        for i in range(1, len(lstY) - 1):
             if (i % 2 != 0):
                 resultSvoi += 4 * lstY[i]
             else:
                 resultSvoi += 2 * lstY[i]
         resultSvoi += lstY[-1]
-        resultSvoi *= (0.02/3)
+        resultSvoi *= (0.02 / 3)
         resultSvoi = "{:.2f}".format(resultSvoi)
         print(resultSvoi)
         thread2 = Thread(target=lambda: Table(lstX, lstY, resultSvoi, "свои расчёты"))
         thread3 = Thread(target=lambda: draw(lstX, lstY, 0.8, 1.20, lstfullY))
+        thread4 = Thread(target=lambda: formula(1))
 
         thread1.start()
         thread2.start()
         thread3.start()
+        thread4.start()
     elif (a == 1):
         lstX = numpy.arange(0.4, 1.21, 0.02)
-        lmd = lambda x: (math.cos(x)/(x+1))
+        lmd = lambda x: (math.cos(x) / (x + 1))
         lstY = list(map(lmd, lstX))
         lstfullY = list(map(lmd, numpy.arange(0, 10, 0.02)))
         result = "{:.2f}".format(integrate.simpson([lmd(i) for i in lstX], dx=0.02))
         print(result)
-        thread1 = Thread(target=lambda : Table(lstX, lstY, result, "scipy"))
+        thread1 = Thread(target=lambda: Table(lstX, lstY, result, "scipy"))
         resultSvoi = 0
         resultSvoi += lstY[0]
-        for i in range(1, len(lstY)-1):
+        for i in range(1, len(lstY) - 1):
             if (i % 2 != 0):
                 resultSvoi += 4 * lstY[i]
             else:
                 resultSvoi += 2 * lstY[i]
         resultSvoi += lstY[-1]
-        resultSvoi *= (0.02/3)
+        resultSvoi *= (0.02 / 3)
         resultSvoi = "{:.2f}".format(resultSvoi)
         print(resultSvoi)
-        thread2 = Thread(target=lambda : Table(lstX, lstY, resultSvoi, "свои расчёты"))
+        thread2 = Thread(target=lambda: Table(lstX, lstY, resultSvoi, "свои расчёты"))
         thread3 = Thread(target=lambda: draw(lstX, lstY, 0.4, 1.20, lstfullY))
+        thread4 = Thread(target=lambda: formula(1))
 
         thread1.start()
         thread2.start()
         thread3.start()
+        thread4.start()
     elif (a == 2):
         lstX = numpy.arange(0.18, 0.99, 0.02)
-        lmd = lambda x: (math.sin(2*x) / (x + 1))
+        lmd = lambda x: (math.sin(2 * x) / (x + 1))
         lstY = list(map(lmd, lstX))
         lstfullY = list(map(lmd, numpy.arange(0, 10, 0.02)))
         result = "{:.2f}".format(integrate.simpson([lmd(i) for i in lstX], dx=0.02))
@@ -97,36 +102,39 @@ def colculation(a):
         print(resultSvoi)
         thread2 = Thread(target=lambda: Table(lstX, lstY, resultSvoi, "свои расчёты"))
         thread3 = Thread(target=lambda: draw(lstX, lstY, 0.18, 0.98, lstfullY))
+        thread4 = Thread(target=lambda: formula(1))
 
         thread1.start()
         thread2.start()
         thread3.start()
+        thread4.start()
     elif (a == 3):
         lstX = numpy.arange(1, 2.01, 0.02)
-        lmd = lambda x: (1/(math.sqrt(2*pow(x, 2)+1.3)))
+        lmd = lambda x: (1 / (math.sqrt(2 * pow(x, 2) + 1.3)))
         lstY = list(map(lmd, lstX))
         lstfullY = list(map(lmd, numpy.arange(0, 10, 0.02)))
         result = "{:.2f}".format(integrate.simpson([lmd(i) for i in lstX], dx=0.02))
         print(result)
         thread1 = Thread(target=lambda: Table(lstX, lstY, result, "scipy"))
         resultSvoi = 0
-        resultSvoi2 = ((3*0.02)/(8))*(lstY[0] + 3*lstY[1] + 3*lstY[2] + lstY[3])
-        for i in range(4, len(lstY) - 5):
+        resultSvoi += lstY[0]
+        for i in range(1, len(lstY) - 1):
             if (i % 2 != 0):
                 resultSvoi += 4 * lstY[i]
             else:
                 resultSvoi += 2 * lstY[i]
         resultSvoi += lstY[-1]
         resultSvoi *= (0.02 / 3)
-        resultSvoi += resultSvoi2
         resultSvoi = "{:.2f}".format(resultSvoi)
         print(resultSvoi)
         thread2 = Thread(target=lambda: Table(lstX, lstY, resultSvoi, "свои расчёты"))
         thread3 = Thread(target=lambda: draw(lstX, lstY, 1, 2, lstfullY))
+        thread4 = Thread(target=lambda: formula(1))
 
         thread1.start()
         thread2.start()
         thread3.start()
+        thread4.start()
     elif (a == 4):
         lstX = numpy.arange(0.8, 1.21, 0.02)
         lmd = lambda x: (math.cos(x) / (pow(x, 2) + 1))
@@ -148,13 +156,15 @@ def colculation(a):
         print(resultSvoi)
         thread2 = Thread(target=lambda: Table(lstX, lstY, resultSvoi, "свои расчёты"))
         thread3 = Thread(target=lambda: draw(lstX, lstY, 0.8, 1.20, lstfullY))
+        thread4 = Thread(target=lambda: formula(1))
 
         thread1.start()
         thread2.start()
         thread3.start()
+        thread4.start()
     elif (a == 5):
         lstX = numpy.arange(0.8, 1.61, 0.02)
-        lmd = lambda x: ((pow(x, 2)+1)*math.sin(x-0.5))
+        lmd = lambda x: ((pow(x, 2) + 1) * math.sin(x - 0.5))
         lstY = list(map(lmd, lstX))
         lstfullY = list(map(lmd, numpy.arange(0, 10, 0.02)))
         result = "{:.2f}".format(integrate.simpson([lmd(i) for i in lstX], dx=0.02))
@@ -173,20 +183,22 @@ def colculation(a):
         print(resultSvoi)
         thread2 = Thread(target=lambda: Table(lstX, lstY, resultSvoi, "свои расчёты"))
         thread3 = Thread(target=lambda: draw(lstX, lstY, 0.8, 1.60, lstfullY))
+        thread4 = Thread(target=lambda: formula(1))
 
         thread1.start()
         thread2.start()
         thread3.start()
+        thread4.start()
     elif (a == 6):
         lstX = numpy.arange(2, 3.51, 0.02)
-        lmd = lambda x: (1/(math.sqrt(pow(x, 2)+1)))
+        lmd = lambda x: (1 / (math.sqrt(pow(x, 2) - 1)))
         lstY = list(map(lmd, lstX))
-        lstfullY = list(map(lmd, numpy.arange(0, 10, 0.02)))
+        lstfullY = list(map(lmd, numpy.arange(1.01, 10, 0.02)))
         result = "{:.2f}".format(integrate.simpson([lmd(i) for i in lstX], dx=0.02))
         print(result)
         thread1 = Thread(target=lambda: Table(lstX, lstY, result, "scipy"))
         resultSvoi = 0
-        resultSvoi2 = ((3*0.02)/(8))*(lstY[0] + 3*lstY[1] + 3*lstY[2] + lstY[3])
+        resultSvoi2 = ((3 * 0.02) / (8)) * (lstY[0] + 3 * lstY[1] + 3 * lstY[2] + lstY[3])
         for i in range(4, len(lstY) - 5):
             if (i % 2 != 0):
                 resultSvoi += 4 * lstY[i]
@@ -199,13 +211,15 @@ def colculation(a):
         print(resultSvoi)
         thread2 = Thread(target=lambda: Table(lstX, lstY, resultSvoi, "свои расчёты"))
         thread3 = Thread(target=lambda: draw(lstX, lstY, 2, 3.50, lstfullY))
+        thread4 = Thread(target=lambda: formula(2))
 
         thread1.start()
         thread2.start()
         thread3.start()
+        thread4.start()
     elif (a == 7):
         lstX = numpy.arange(0.4, 1.21, 0.02)
-        lmd = lambda x: (math.sqrt(x)*math.cos(pow(x, 2)))
+        lmd = lambda x: (math.sqrt(x) * math.cos(pow(x, 2)))
         lstY = list(map(lmd, lstX))
         lstfullY = list(map(lmd, numpy.arange(0, 10, 0.02)))
         result = "{:.2f}".format(integrate.simpson([lmd(i) for i in lstX], dx=0.02))
@@ -224,13 +238,15 @@ def colculation(a):
         print(resultSvoi)
         thread2 = Thread(target=lambda: Table(lstX, lstY, resultSvoi, "свои расчёты"))
         thread3 = Thread(target=lambda: draw(lstX, lstY, 0.4, 1.20, lstfullY))
+        thread4 = Thread(target=lambda: formula(1))
 
         thread1.start()
         thread2.start()
         thread3.start()
+        thread4.start()
     elif (a == 8):
         lstX = numpy.arange(0.8, 1.21, 0.02)
-        lmd = lambda x: (math.sin(pow(x, 2)-0.4) / (x + 2))
+        lmd = lambda x: (math.sin(pow(x, 2) - 0.4) / (x + 2))
         lstY = list(map(lmd, lstX))
         lstfullY = list(map(lmd, numpy.arange(0, 10, 0.02)))
         result = "{:.2f}".format(integrate.simpson([lmd(i) for i in lstX], dx=0.02))
@@ -249,13 +265,15 @@ def colculation(a):
         print(resultSvoi)
         thread2 = Thread(target=lambda: Table(lstX, lstY, resultSvoi, "свои расчёты"))
         thread3 = Thread(target=lambda: draw(lstX, lstY, 0.8, 1.20, lstfullY))
+        thread4 = Thread(target=lambda: formula(1))
 
         thread1.start()
         thread2.start()
         thread3.start()
+        thread4.start()
     elif (a == 9):
         lstX = numpy.arange(0.2, 1.01, 0.02)
-        lmd = lambda x: ((x+1)*math.cos(pow(x, 2)))
+        lmd = lambda x: ((x + 1) * math.cos(pow(x, 2)))
         lstY = list(map(lmd, lstX))
         lstfullY = list(map(lmd, numpy.arange(0, 10, 0.02)))
         result = "{:.2f}".format(integrate.simpson([lmd(i) for i in lstX], dx=0.02))
@@ -274,12 +292,15 @@ def colculation(a):
         print(resultSvoi)
         thread2 = Thread(target=lambda: Table(lstX, lstY, resultSvoi, "свои расчёты"))
         thread3 = Thread(target=lambda: draw(lstX, lstY, 0.2, 1, lstfullY))
+        thread4 = Thread(target=lambda: formula(1))
 
         thread1.start()
         thread2.start()
         thread3.start()
+        thread4.start()
 
-
+# Функция Table(lstX, lstY, integral, method) формирует таблицу со значениями x, y,
+# интеграла и каким методом мы его вычислили (самостоятельно или scipy)
 def Table(lstX, lstY, integral, method):
     root1 = tk.Tk()
     root1.geometry("700x500")
@@ -317,8 +338,7 @@ def Table(lstX, lstY, integral, method):
 
     root1.mainloop()
 
-
-
+# Функция HelloWidget() - приветственная функция, которая предлагает пользователю выбрать из 10 функций одну на вычисление интеграла
 def HelloWidget():
     root1 = tk.Tk()
     root1.geometry("900x550")
@@ -389,6 +409,7 @@ def HelloWidget():
 
     tk.mainloop()
 
+
 # Функция draw рисует кривую и закрашенную область под ней на координатной плоскостях
 def draw(ix, iy, a, b, yF):
     x = numpy.arange(0, 10, 0.02)
@@ -403,9 +424,6 @@ def draw(ix, iy, a, b, yF):
     poly = Polygon(verts, facecolor='0.9', edgecolor='0.5')
     ax.add_patch(poly)
 
-    # ax.text(0.5 * (a + b), 30, r"$\int_a^b f(x)\mathrm{d}x$",
-    #         horizontalalignment='center', fontsize=20)
-
     fig.text(0.9, 0.05, '$x$')
     fig.text(0.1, 0.9, '$y$')
 
@@ -417,5 +435,6 @@ def draw(ix, iy, a, b, yF):
     ax.set_yticks([])
 
     plt.show()
+
 
 HelloWidget()
